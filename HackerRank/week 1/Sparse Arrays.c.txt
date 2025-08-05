@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 1000
+#define MAX_LEN 21
+int main() {
+    int n, q;
+    char strings[MAX][MAX_LEN];
+    char queries[MAX][MAX_LEN];
+    int results[MAX];
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++){
+        scanf("%s", strings[i]);
+    }
+    scanf("%d", &q);
+    for (int i = 0; i < q; i++){
+         scanf("%s", queries[i]);
+    }
+    for (int i = 0; i < q; i++){
+        results[i] = 0;
+    }
+     for (int i = 0; i < q; i++){
+         for (int j = 0; j < n; j++){
+            if (strcmp(queries[i],strings[j]) == 0){
+                results[i]++;
+            }
+         }
+     }
+     for (int i = 0; i < q; i++) {
+        printf("%d\n", results[i]);
+     }
+     return 0;
+}
