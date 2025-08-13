@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 205
+
+int r, c;
+char grid[MAX][MAX], temp[MAX][MAX];
+
+// Fill grid with bombs
+void fill_bombs(char g[MAX][MAX]) {
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            g[i][j] = 'O';
+}
+
+// Detonate bombs from a previous state
+void detonate(char prev[MAX][MAX], char next[MAX][MAX]) {
+    fill_bombs(next); // Start full of bombs
+
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            if (prev[i][j] == 'O') {
+                next[i][j] = '.';
+                if (i > 0) next[i-1][j] = '.';
+                if (i < r - 1) next[i+1][j] = '.';
+                if (j > 0) next[i][j-1] = '.';
+                if (j < c - 1) next[i][j+1] = '.';
+            }
+        }
+    }
+}
+
+int main() {
+    long long n;
+    scanf("%d %d %lld", &r, &c, &n);
+
+    for (int i = 0; i < r; i++) {
+        scanf("%s", grid[i]);
+        // Normalize input: replace '0' with 'O'
+        for (int j = 0; j < c; j++)
+            if (grid[i][j] == '0') grid[i][j] = 'O';
+    }
+
+    if (n == 1) {
+        // Print initial state
+        for (int i = 0; i < r; i++)
+            printf("%s\n", grid[i]);
+    }
+    else if (n % 2 == 0) {
+        // Full bombs
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) printf("O");
+            printf("\n");
+        }
+    }
+    else if (n % 4 == 3) {
+        detonate(grid, temp);
+        for (int i = 0; i < r; i++)
+            printf("%s\n", temp[i]);
+    }
+    else { // n % 4 == 1 and n > 1
+        char first[MAX][MAX];
+        detonate(grid, first);
+        detonate(first, temp);
+        for (int i = 0; i < r; i++)
+            printf("%s\n", temp[i]);
+    }
+
+    return 0;
+}
