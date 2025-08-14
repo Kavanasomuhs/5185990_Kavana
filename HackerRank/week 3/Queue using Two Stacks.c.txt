@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100000
+
+typedef struct {
+    long long data[MAX];
+    int top;
+} Stack;
+
+void push(Stack *s, long long value) {
+    s->data[++(s->top)] = value;
+}
+
+long long pop(Stack *s) {
+    return s->data[(s->top)--];
+}
+
+long long peek(Stack *s) {
+    return s->data[s->top];
+}
+
+int isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+int main() {
+    Stack stack1, stack2;
+    stack1.top = -1;
+    stack2.top = -1;
+
+    int q;
+    scanf("%d", &q);
+
+    while (q--) {
+        int type;
+        scanf("%d", &type);
+
+        if (type == 1) {
+            long long x;
+            scanf("%lld", &x);
+            push(&stack1, x); 
+        } 
+        else if (type == 2) {
+            if (isEmpty(&stack2)) {
+                while (!isEmpty(&stack1)) {
+                    push(&stack2, pop(&stack1));
+                }
+            }
+            pop(&stack2);         } 
+        else if (type == 3) {
+            if (isEmpty(&stack2)) {
+                while (!isEmpty(&stack1)) {
+                    push(&stack2, pop(&stack1));
+                }
+            }
+            printf("%lld\n", peek(&stack2));         }
+    }
+
+    return 0;
+}

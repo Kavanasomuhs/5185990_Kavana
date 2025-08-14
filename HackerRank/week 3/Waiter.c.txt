@@ -1,0 +1,65 @@
+int* waiter(int number_count, int* number, int q, int* result_count) {
+        int* result = (int*)malloc(number_count * sizeof(int));
+    int res_index = 0;
+
+    
+    int* A = (int*)malloc(number_count * sizeof(int));
+    int A_top = number_count;
+    for (int i = 0; i < number_count; i++) A[i] = number[i];
+
+    int* B = (int*)malloc(number_count * sizeof(int));
+    int B_top;
+
+    for (int i = 1; i <= q; i++) {
+        int prime = nth_prime(i);
+        B_top = 0;
+
+        int* next_A = (int*)malloc(number_count * sizeof(int));
+        int next_A_top = 0;
+
+        
+        for (int j = A_top - 1; j >= 0; j--) {
+            if (A[j] % prime == 0) {
+                B[B_top++] = A[j];         
+            } else {
+                next_A[next_A_top++] = A[j]; 
+            }
+        }
+
+        
+        for (int j = B_top - 1; j >= 0; j--) {
+            result[res_index++] = B[j];
+        }
+
+        free(A);
+        A = next_A;
+        A_top = next_A_top;
+    }
+
+    
+    for (int j = A_top - 1; j >= 0; j--) {
+        result[res_index++] = A[j];
+    }
+
+    free(A);
+    free(B);
+
+    *result_count = res_index;
+    return result;
+}
+int is_prime(int num) {
+    if (num < 2) return 0;
+    for (int i = 2; i * i <= num; i++) {
+        if (num % i == 0) return 0;
+    }
+    return 1;
+}
+
+int nth_prime(int n) {
+    int count = 0, num = 1;
+    while (count < n) {
+        num++;
+        if (is_prime(num)) count++;
+    }
+    return num;
+}
