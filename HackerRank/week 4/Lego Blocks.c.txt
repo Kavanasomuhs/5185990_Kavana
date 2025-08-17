@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MOD 1000000007
+
+long modPow(long base, long exp) {
+    long res = 1;
+    base %= MOD;
+    while (exp > 0) {
+        if (exp & 1)
+            res = (res * base) % MOD;
+        base = (base * base) % MOD;
+        exp >>= 1;
+    }
+    return res;
+}
+
+int legoBlocks(int n, int m) {
+    long row[m + 1], total[m + 1], valid[m + 1];
+    int i, j;
+
+    
+    row[0] = 1;
+    for (i = 1; i <= m; i++) {
+        row[i] = 0;
+        for (j = 1; j <= 4; j++) {
+            if (i - j >= 0)
+                row[i] = (row[i] + row[i - j]) % MOD;
+        }
+    }
+
+        for (i = 1; i <= m; i++) {
+        total[i] = modPow(row[i], n);
+    }
+
+    
+    valid[0] = 0;
+    for (i = 1; i <= m; i++) {
+        valid[i] = total[i];
+        for (j = 1; j < i; j++) {
+            valid[i] = (valid[i] - (valid[j] * total[i - j]) % MOD + MOD) % MOD;
+        }
+    }
+
+    return (int)(valid[m] % MOD);
+}
+
+int main() {
+    int t;
+    scanf("%d", &t);
+    while (t--) {
+        int n, m;
+        scanf("%d %d", &n, &m);
+        printf("%d\n", legoBlocks(n, m));
+    }
+    return 0;
+}

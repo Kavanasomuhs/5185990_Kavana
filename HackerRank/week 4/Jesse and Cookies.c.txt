@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void heapify_down(int* heap, int size, int i) {
+    int smallest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < size && heap[left] < heap[smallest]) smallest = left;
+    if (right < size && heap[right] < heap[smallest]) smallest = right;
+
+    if (smallest != i) {
+        int temp = heap[i];
+        heap[i] = heap[smallest];
+        heap[smallest] = temp;
+        heapify_down(heap, size, smallest);
+    }
+}
+
+void heapify_up(int* heap, int i) {
+    while (i > 0) {
+        int parent = (i - 1) / 2;
+        if (heap[i] < heap[parent]) {
+            int temp = heap[i];
+            heap[i] = heap[parent];
+            heap[parent] = temp;
+            i = parent;
+        } else break;
+    }
+}
+
+int extract_min(int* heap, int* size) {
+    if (*size <= 0) return -1;
+    int root = heap[0];
+    heap[0] = heap[*size - 1];
+    (*size)--;
+    heapify_down(heap, *size, 0);
+    return root;
+}
+
+void insert_heap(int* heap, int* size, int val) {
+    heap[*size] = val;
+    (*size)++;
+    heapify_up(heap, *size - 1);
+}
+
+int cookies(int k, int A_count, int* A) {
+    // Build min-heap
+    int size = A_count;
+    for (int i = size / 2 - 1; i >= 0; i--) {
+        heapify_down(A, size, i);
+    }
+
+    int operations = 0;
+
+    while (size > 0 && A[0] < k) {
+        if (size < 2) return -1;
+
+        int least = extract_min(A, &size);
+        int second = extract_min(A, &size);
+
+        long long new_cookie = (long long)least + 2LL * second;
+        insert_heap(A, &size, (int)new_cookie);
+
+        operations++;
+    }
+
+    return operations;
+}
+
+int main() {
+    int n, k;
+    scanf("%d %d", &n, &k);
+
+    int* A = (int*)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &A[i]);
+    }
+
+    int result = cookies(k, n, A);
+    printf("%d\n", result);
+
+    free(A);
+    return 0;
+}

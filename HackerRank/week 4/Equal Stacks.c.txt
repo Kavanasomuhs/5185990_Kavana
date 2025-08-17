@@ -1,0 +1,25 @@
+int equalStacks(int h1_count, int* h1, int h2_count, int* h2, int h3_count, int* h3) {
+    int i = 0, j = 0, k = 0;
+
+    int sum1 = 0, sum2 = 0, sum3 = 0;
+
+    for (int x = 0; x < h1_count; x++) sum1 += h1[x];
+    for (int x = 0; x < h2_count; x++) sum2 += h2[x];
+    for (int x = 0; x < h3_count; x++) sum3 += h3[x];
+
+    while (i < h1_count && j < h2_count && k < h3_count) {
+        if (sum1 == sum2 && sum2 == sum3) {
+            return sum1;
+        }
+
+        if (sum1 >= sum2 && sum1 >= sum3) {
+            sum1 -= h1[i++];
+        } else if (sum2 >= sum1 && sum2 >= sum3) {
+            sum2 -= h2[j++];
+        } else {
+            sum3 -= h3[k++];
+        }
+    }
+
+    return 0;
+}
