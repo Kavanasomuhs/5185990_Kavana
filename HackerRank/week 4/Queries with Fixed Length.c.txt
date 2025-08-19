@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+typedef struct {
+    int *data;
+    int front, back;
+} Deque;
+
+Deque* createDeque(int n) {
+    Deque* dq = (Deque*)malloc(sizeof(Deque));
+    dq->data = (int*)malloc(n * sizeof(int));
+    dq->front = 0;
+    dq->back = -1;
+    return dq;
+}
+
+int isEmpty(Deque* dq) {
+    return dq->front > dq->back;
+}
+
+void pushBack(Deque* dq, int val) {
+    dq->data[++dq->back] = val;
+}
+
+void popFront(Deque* dq) {
+    dq->front++;
+}
+
+int front(Deque* dq) {
+    return dq->data[dq->front];
+}
+
+int back(Deque* dq) {
+    return dq->data[dq->back];
+}
+
+void popBack(Deque* dq) {
+    dq->back--;
+}
+
+void freeDeque(Deque* dq) {
+    free(dq->data);
+    free(dq);
+}
+
+
+int minOfMax(int* arr, int n, int d) {
+    Deque* dq = createDeque(n);
+    int minVal = 1000000000; // big number
+
+    for (int i = 0; i < n; i++) {
+                if (!isEmpty(dq) && front(dq) <= i - d) {
+            popFront(dq);
+        }
+
+                while (!isEmpty(dq) && arr[back(dq)] <= arr[i]) {
+            popBack(dq);
+        }
+
+        pushBack(dq, i);
+
+        
+        if (i >= d - 1) {
+            int maxInWindow = arr[front(dq)];
+            if (maxInWindow < minVal) {
+                minVal = maxInWindow;
+            }
+        }
+    }
+
+    freeDeque(dq);
+    return minVal;
+}
+
+
+int* solve(int arr_count, int* arr, int queries_count, int* queries, int* result_count) {
+    *result_count = queries_count;
+    int* result = (int*)malloc((*result_count) * sizeof(int));
+
+    for (int i = 0; i < queries_count; i++) {
+        int d = queries[i];
+        result[i] = minOfMax(arr, arr_count, d);
+    }
+
+    return result;
+}
+
+
+int main() {
+    int n, q;
+    scanf("%d %d", &n, &q);
+
+    int* arr = (int*)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    int* queries = (int*)malloc(q * sizeof(int));
+    for (int i = 0; i < q; i++) {
+        scanf("%d", &queries[i]);
+    }
+
+    int result_count;
+    int* res = solve(n, arr, q, queries, &result_count);
+
+    for (int i = 0; i < result_count; i++) {
+        printf("%d\n", res[i]);
+    }
+
+    free(arr);
+    free(queries);
+    free(res);
+
+    return 0;
+}

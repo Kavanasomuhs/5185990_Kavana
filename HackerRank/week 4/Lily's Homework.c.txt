@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Pair structure for mapping value -> original index
+typedef struct {
+    int value;
+    int index;
+} Pair;
+
+// compare functions
+int cmpAsc(const void* a, const void* b) {
+    return ((Pair*)a)->value - ((Pair*)b)->value;
+}
+int cmpDesc(const void* a, const void* b) {
+    return ((Pair*)b)->value - ((Pair*)a)->value;
+}
+
+// Count minimum swaps needed to convert arr -> sorted target
+int countSwaps(int n, int* arr, Pair* sorted) {
+    int* visited = (int*)calloc(n, sizeof(int));
+    int swaps = 0;
+
+    for (int i = 0; i < n; i++) {
+        // already visited or already in correct position
+        if (visited[i] || sorted[i].index == i) continue;
+
+        int cycle_size = 0;
+        int j = i;
+
+        while (!visited[j]) {
+            visited[j] = 1;
+            j = sorted[j].index;
+            cycle_size++;
+        }
+
+        if (cycle_size > 1) {
+            swaps += (cycle_size - 1);
+        }
+    }
+
+    free(visited);
+    return swaps;
+}
+
+int lilysHomework(int arr_count, int* arr) {
+    // Build array of pairs
+    Pair* asc = (Pair*)malloc(arr_count * sizeof(Pair));
+    Pair* desc = (Pair*)malloc(arr_count * sizeof(Pair));
+
+    for (int i = 0; i < arr_count; i++) {
+        asc[i].value = arr[i];
+        asc[i].index = i;
+
+        desc[i].value = arr[i];
+        desc[i].index = i;
+    }
+
+    // Sort ascending and descending
+    qsort(asc, arr_count, sizeof(Pair), cmpAsc);
+    qsort(desc, arr_count, sizeof(Pair), cmpDesc);
+
+    // Fix indices after sorting
+    for (int i = 0; i < arr_count; i++) {
+        asc[i].index = asc[i].index;
+        desc[i].index = desc[i].index;
+    }
+
+    int swapsAsc = countSwaps(arr_count, arr, asc);
+    int swapsDesc = countSwaps(arr_count, arr, desc);
+
+    free(asc);
+    free(desc);
+
+    return (swapsAsc < swapsDesc ? swapsAsc : swapsDesc);
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int* arr = (int*)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    int result = lilysHomework(n, arr);
+    printf("%d\n", result);
+
+    free(arr);
+    return 0;
+}
