@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int *visited;
+
+typedef struct {
+    int *neighbors;
+    int size;
+    int capacity;
+} AdjList;
+
+void addEdge(AdjList *adj, int u, int v) {
+    if (adj[u].size == adj[u].capacity) {
+        adj[u].capacity = adj[u].capacity == 0 ? 2 : adj[u].capacity * 2;
+        adj[u].neighbors = realloc(adj[u].neighbors, adj[u].capacity * sizeof(int));
+    }
+    adj[u].neighbors[adj[u].size++] = v;
+}
+
+long roadsAndLibraries(int n, int c_lib, int c_road, int cities_rows, int cities_columns, int** cities) {
+    if (c_lib <= c_road) {
+        return (long)c_lib * n; 
+    }
+
+    AdjList *adj = (AdjList *)calloc(n+1, sizeof(AdjList));
+
+       for (int i = 0; i < cities_rows; i++) {
+        int u = cities[i][0];
+        int v = cities[i][1];
+        addEdge(adj, u, v);
+        addEdge(adj, v, u);
+    }
+
+    visited = (int *)calloc(n+1, sizeof(int));
+    long totalCost = 0;
+
+       for (int i = 1; i <= n; i++) {
+        if (!visited[i]) {
+            int *stack = (int *)malloc((n+1) * sizeof(int));
+            int top = 0;
+            stack[top++] = i;
+            visited[i] = 1;
+            int size = 0;
+
+            while (top) {
+                int node = stack[--top];
+                size++;
+                for (int j = 0; j < adj[node].size; j++) {
+                    int neighbor = adj[node].neighbors[j];
+                    if (!visited[neighbor]) {
+                        visited[neighbor] = 1;
+                        stack[top++] = neighbor;
+                    }
+                }
+            }
+            totalCost += (long)c_lib + (long)(size - 1) * c_road;
+            free(stack);
+        }
+    }
+
+        for (int i = 0; i <= n; i++) {
+        free(adj[i].neighbors);
+    }
+    free(adj);
+    free(visited);
+
+    return totalCost;
+}
+
+int main() {
+    int q;
+    scanf("%d", &q);
+
+    while (q--) {
+        int n, m, c_lib, c_road;
+        scanf("%d %d %d %d", &n, &m, &c_lib, &c_road);
+
+        int **cities = (int **)malloc(m * sizeof(int *));
+        for (int i = 0; i < m; i++) {
+            cities[i] = (int *)malloc(2 * sizeof(int));
+            scanf("%d %d", &cities[i][0], &cities[i][1]);
+        }
+
+        long result = roadsAndLibraries(n, c_lib, c_road, m, 2, cities);
+        printf("%ld\n", result);
+
+        for (int i = 0; i < m; i++) free(cities[i]);
+        free(cities);
+    }
+    return 0;
+}

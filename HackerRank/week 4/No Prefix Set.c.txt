@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define ALPHABET_SIZE 26
+struct TrieNode {
+    struct TrieNode* children[ALPHABET_SIZE];
+    int isEndOfWord;
+};
+
+struct TrieNode* createNode() {
+    struct TrieNode* node = (struct TrieNode*)malloc(sizeof(struct TrieNode));
+    for (int i = 0; i < ALPHABET_SIZE; i++)
+        node->children[i] = NULL;
+    node->isEndOfWord = 0;
+    return node;
+}
+
+int insertAndCheck(struct TrieNode* root, char* word) {
+    struct TrieNode* current = root;
+    for (int i = 0; word[i]; i++) {
+        int index = word[i] - 'a';
+
+        if (current->children[index] == NULL)
+            current->children[index] = createNode();
+
+        current = current->children[index];
+        if (current->isEndOfWord)
+            return 0;
+    }
+
+
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (current->children[i] != NULL)
+            return 0;
+    }
+
+    current->isEndOfWord = 1;
+    return 1;
+}
+
+void noPrefix(int words_count, char** words) {
+    struct TrieNode* root = createNode();
+
+    for (int i = 0; i < words_count; i++) {
+        if (!insertAndCheck(root, words[i])) {
+            printf("BAD SET\n");
+            printf("%s\n", words[i]);
+            return;
+        }
+    }
+
+    printf("GOOD SET\n");
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    char** words = (char**)malloc(n * sizeof(char*));
+    for (int i = 0; i < n; i++) {
+        words[i] = (char*)malloc(105 * sizeof(char));
+        scanf("%s", words[i]);
+    }
+
+    noPrefix(n, words);
+    for (int i = 0; i < n; i++)
+        free(words[i]);
+    free(words);
+
+    return 0;
+}

@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
+
+struct Node {
+    int x, y;
+};
+
+int minimumMoves(int grid_count, char** grid, int startX, int startY, int goalX, int goalY) {
+    int n = grid_count;
+    int dist[n][n];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            dist[i][j] = INT_MAX;
+    struct Node* queue = (struct Node*)malloc(n * n * sizeof(struct Node));
+    int front = 0, back = 0;
+    dist[startX][startY] = 0;
+    queue[back++] = (struct Node){startX, startY};
+
+    while (front < back) {
+        struct Node cur = queue[front++];
+        int x = cur.x, y = cur.y;
+
+            for (int d = 0; d < 4; d++) {
+            int nx = x + dx[d];
+            int ny = y + dy[d];
+
+          
+            while (nx >= 0 && ny >= 0 && nx < n && ny < n && grid[nx][ny] != 'X') {
+                if (dist[nx][ny] > dist[x][y] + 1) {
+                    dist[nx][ny] = dist[x][y] + 1;
+                    queue[back++] = (struct Node){nx, ny};
+                }
+                nx += dx[d];
+                ny += dy[d];
+            }
+        }
+    }
+
+    int answer = dist[goalX][goalY];
+    free(queue);
+    return answer;
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    char** grid = (char**)malloc(n * sizeof(char*));
+    for (int i = 0; i < n; i++) {
+        grid[i] = (char*)malloc((n + 1) * sizeof(char));
+        scanf("%s", grid[i]);
+    }
+
+    int startX, startY, goalX, goalY;
+    scanf("%d %d %d %d", &startX, &startY, &goalX, &goalY);
+
+    int result = minimumMoves(n, grid, startX, startY, goalX, goalY);
+    printf("%d\n", result);
+    for (int i = 0; i < n; i++)
+        free(grid[i]);
+    free(grid);
+
+    return 0;
+}
